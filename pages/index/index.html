@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Trades</title>
+
+	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.flash.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../css/index.css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+
+    <script type="text/javascript">
+        $(document).ready( function () {
+
+            $('#dataTable').DataTable({
+    
+                "language": {
+                "sEmptyTable": "Nenhum registro encontrado",
+                "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sInfoThousands": ".",
+                "sLengthMenu": "_MENU_ resultados por página",
+                "sLoadingRecords": "Carregando...",
+                "sProcessing": "Processando...",
+                "sZeroRecords": "Nenhum registro encontrado",
+                "sSearch": "Pesquisar",
+                "oPaginate": {
+                "sNext": "Próximo",
+                "sPrevious": "Anterior",
+                "sFirst": "Primeiro",
+                "sLast": "Último"
+                },
+                "oAria": {
+                "sSortAscending": ": Ordenar colunas de forma ascendente",
+                "sSortDescending": ": Ordenar colunas de forma descendente"
+                },
+                "select": {
+                "rows": {
+                "_": "Selecionado %d linhas",
+                "0": "Nenhuma linha selecionada",
+                "1": "Selecionado 1 linha"
+                }
+                }
+            }
+            })
+        } );
+    </script>
+
+</head>
+<body>
+    
+    <div id="content-wrapper">
+
+        <div class="container-fluid">
+
+
+            <div class="card mb-3" style="margin-top: 1%;">
+                <div class="card-header" id="positionListHeader">
+
+                    <h id="totalProfit" style="float: left; font-size: 200%; color:#376e45;">Lucro:</h>
+                    <h id="totalLoss" style="position: absolute; left: 20%; font-size: 200%; color: #a31a1a;">Perda:</h>
+                    <h id="totalDiference" style="position: absolute; left: 40%; font-size: 200%;">Diferença:</h>
+                    <a id="novaPosicaoBtn" type="button" class="btn btn-primary btn-dark" style="float: right; color: white;">Nova Posição</a>
+
+                </div>
+                <div class="card-body" >
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-sm" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark" style="text-align: center;">
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Papel</th>
+                                    <th>Data Entrada</th>
+                                    <th>Data Saida</th>
+                                    <th>Dias Aberto</th>
+                                    <th>Valor Entrada</th>
+                                    <th>Valor Saída</th>
+                                    <th>Diferença</th>
+                                </tr>
+                            </thead>
+                                <tbody id="tradesTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <footer class="sticky-footer">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright © Henrique 2020</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+<!-- Modal HTML New Position -->
+<div id="newPositionModal" class="modal fade">
+	<div class="modal-dialog modal-login">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">				
+					<h4 class="modal-title">Adicionar Nova Posição.</h4>
+				</div>
+				<div id="newPositionForm" class="modal-body">				
+					<div class="form-group">
+						<label class="inputTitle">Papel</label>
+                        <input id="paper_input" type="text" class="form-control">
+                        <label class="inputTitle">Data Entrada</label>
+                        <input id="entryDate_input" type="date" data-date-format="DD MMMM YYYY" class="form-control">
+                        <label class="inputTitle">Data Saída</label>
+                        <input id="exitDate_input" type="date" data-date-format="DD MMMM YYYY" class="form-control">
+                        <label class="inputTitle">Valor Entreada</label>
+                        <input id="entryValue_input" type="text" step="any" class="form-control">
+                        <label class="inputTitle">Valor Saída</label>
+						<input id="exitValue_input" type="text" step="any" class="form-control">
+                    </div>
+				</div>
+				<div class="modal-footer">
+                    <a id="savePositionBtn" class="btn btn-primary btn-block btn-dark" style="color: white;">Salvar</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Modal HTML Edit Position -->
+<div id="editPositionModal" class="modal fade">
+	<div class="modal-dialog modal-login">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">				
+					<h4 class="modal-title">Editar Posição.</h4>
+				</div>
+				<div id="editPositionForm" class="modal-body">				
+					<div class="form-group">
+                        <label class="inputTitle">Trade id :</label> <h id="tradeId"></h>
+                        <p></p>
+						<label class="inputTitle">Papel</label>
+                        <input id="editPaper_input" type="text" class="form-control">
+                        <label class="inputTitle">Data Entrada</label>
+                        <input id="editEntryDate_input" type="text" class="form-control" onfocus="(this.type='date')">
+                        <label class="inputTitle">Data Saída</label>
+                        <input id="editExitDate_input" type="text" class="form-control" onfocus="(this.type='date')">
+                        <label class="inputTitle">Valor Entrada</label>
+                        <input id="editEntryValue_input" type="text" min="0" step="0.01" data-number-to-fixed="2" class="form-control" data-number-stepfactor="100" class="form-control currency">
+                        <label class="inputTitle">Valor Saída</label>
+						<input id="editExitValue_input" type="text" step="any" class="form-control">
+                    </div>
+				</div>
+				<div class="modal-footer">
+                    <a id="saveEditPositionBtn" class="btn btn-primary btn-block" style="color: white;">Salvar</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
+
+
+<script src="../helper/currency.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+<script src="index.js"></script>
+
+</body>
+</html>
